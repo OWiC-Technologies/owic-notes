@@ -5,7 +5,7 @@
         flat
         round
         dense
-        icon="mdi-format-list-bulleted"
+        icon="mdi-format-list-checks"
         @click="editor.chain().toggleTaskList().run()"
       />
       <q-btn

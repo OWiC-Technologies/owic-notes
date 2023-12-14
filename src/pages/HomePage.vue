@@ -60,7 +60,7 @@
 </template>
 
 <script>
-import { ref, defineComponent } from "vue";
+import { ref, defineComponent, onMounted } from "vue";
 import { useQuasar } from "quasar";
 import { OWiCConnect } from "owic-app-service";
 import NotePreview from "src/components/NotePreview.vue";
@@ -142,18 +142,18 @@ export default defineComponent({
       selectedList.value = [];
     };
 
-    async function asyncSetup() {
+    onMounted(async () => {
       const response = await OWiCConnect.getData("notes");
-      notesList.value.push(...response);
-      updateColumns();
+      if (Symbol.iterator in Object(response)) {
+        notesList.value.push(...response);
+        updateColumns();
+      }
 
       const checkLoggedIn = await OWiCConnect.getUser();
       if (checkLoggedIn.errors.length == 0) {
         loggedIn.value = true;
       }
-    }
-
-    asyncSetup();
+    });
 
     return {
       selectMode,

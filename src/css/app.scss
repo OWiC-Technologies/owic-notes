@@ -1,0 +1,75 @@
+// app global css in SCSS form
+.header-font {
+  font-family: "Libre Baskerville", serif;
+}
+
+.safe-area-fullscreen {
+  padding-top: 3em;
+  .q-page {
+    min-height: calc(100vh - 3em) !important;
+  }
+}
+
+.safe-area {
+  padding-top: 3em;
+  .q-page-container {
+    padding-top: 6em !important;
+    .q-page {
+      min-height: calc(100vh - 6em - 86px) !important;
+    }
+  }
+  header {
+    padding-top: calc(16px + 3em);
+  }
+  .q-drawer {
+    padding-top: 3em;
+  }
+}
+
+.text-grey {
+  color: #7e7e7e;
+}
+
+.tiptap {
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  video {
+    max-width: 100%;
+    height: auto;
+  }
+
+  ul {
+    padding-inline-start: 1rem;
+  }
+
+  li {
+    display: flex;
+    line-height: 1.1;
+
+    > label {
+      flex: 0 0 auto;
+      margin-right: 0.5rem;
+      user-select: none;
+      > input {
+        height: 1rem;
+        width: 1rem;
+      }
+    }
+
+    > div {
+      flex: 1 1 auto;
+    }
+
+    ul li,
+    ol li {
+      display: list-item;
+    }
+
+    ul[data-type="taskList"] > li {
+      display: flex;
+    }
+  }
+}

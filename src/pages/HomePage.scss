@@ -1,0 +1,40 @@
+.fixed-bottom-right {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+}
+
+.notes-area {
+  border-radius: 24px;
+  border: 3px dashed $primary;
+  background: rgba(217, 217, 217, 0.2);
+  aspect-ratio: 0.7;
+  max-height: 60em;
+  .column {
+    margin: auto auto;
+    pointer-events: none;
+  }
+}
+
+.upload-area {
+  .q-field__inner {
+    .q-field__control::before {
+      border-radius: 24px;
+      border: 3px dashed $primary;
+      background: rgba(217, 217, 217, 0.2);
+    }
+    .q-field__control {
+      margin: 0 auto;
+      border-radius: 24px;
+      aspect-ratio: 0.7;
+      max-height: 60em;
+      .q-field__native {
+        width: 0;
+      }
+      .column {
+        margin: auto auto;
+        pointer-events: none;
+      }
+    }
+  }
+}

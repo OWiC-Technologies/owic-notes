@@ -4,9 +4,30 @@
   width: calc(100% - 3em);
   max-width: 60em;
   min-height: 80vh;
+  padding-bottom: 10rem;
 
   &:focus {
     outline: none !important;
+  }
+
+  .has-focus.media-node-view .w-fit {
+    outline: 2px solid $primary;
+    border-radius: 0.5rem;
+  }
+
+  .has-focus {
+    .horizontal-resize-handle,
+    .vertical-resize-handle {
+      opacity: 0.8;
+    }
+  }
+
+  p.is-editor-empty:first-child::before {
+    color: #adb5bd;
+    content: attr(data-placeholder);
+    float: left;
+    height: 0;
+    pointer-events: none;
   }
 }
 

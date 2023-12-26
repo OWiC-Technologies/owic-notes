@@ -1,6 +1,6 @@
 <template>
   <div class="editor-container">
-    <div class="menu-bar">
+    <div class="menu-bar" v-if="showOptions">
       <q-btn
         flat
         round
@@ -67,7 +67,7 @@
 
 <script>
 import { onMounted, ref } from "vue";
-import { useRoute } from "vue-router";
+import { onBeforeRouteLeave, useRoute } from "vue-router";
 import { useQuasar } from "quasar";
 import { useEditor, EditorContent } from "@tiptap/vue-3";
 import { toBase64, getThumbnail } from "src/services/utils";
@@ -120,6 +120,7 @@ export default {
     const $q = useQuasar();
     const route = useRoute();
     const noteId = route.params.noteId;
+    const showOptions = ref(false);
 
     let notesList = ref([]);
 
@@ -163,7 +164,10 @@ export default {
         Mention,
         OrderedList,
         Paragraph,
-        Placeholder,
+        Placeholder.configure({
+          placeholder: "Start your new note...",
+          emptyEditorClass: "is-editor-empty",
+        }),
         ResizableMedia,
         Strike,
         Subscript,
@@ -179,7 +183,9 @@ export default {
         TextStyle,
         Underline,
       ],
-      onUpdate: saveEditorContent,
+      onFocus: ({ editor }) => {
+        showOptions.value = editor.isFocused;
+      },
     });
 
     onMounted(async () => {
@@ -190,7 +196,6 @@ export default {
       if (saveIndex !== -1) {
         let noteId = notesList.value[saveIndex].id;
         let noteContent = notesList.value[saveIndex].content;
-        console.log(notesList.value);
         editor.value.commands.setContent(noteContent);
       }
     });
@@ -290,8 +295,6 @@ export default {
             const response = await OWiCConnect.uploadMedia(fileObj, update);
             let fileMap = response[0];
 
-            console.log(fileMap);
-
             const url = fileMap.url;
             if (fileMap.type.startsWith("image/")) {
               // editor.value.chain().focus().setImage({ src: url }).run();
@@ -304,6 +307,7 @@ export default {
                 width: "800",
                 height: "400",
               });
+              editor.value?.commands.createParagraphNear();
             } else if (fileMap.type.startsWith("video/")) {
               editor.value?.commands.setMedia({
                 src: url,
@@ -314,6 +318,7 @@ export default {
                 width: "800",
                 height: "400",
               });
+              editor.value?.commands.createParagraphNear();
             } else if (fileMap.type.startsWith("audio/")) {
               editor.value.chain().focus().setNode("audio", { src: url }).run();
             }
@@ -327,8 +332,15 @@ export default {
       }
     };
 
+    onBeforeRouteLeave((to) => {
+      if (to.name !== "NotePage") {
+        saveEditorContent({ editor: editor.value });
+      }
+    });
+
     return {
       editor,
+      showOptions,
       uploaderRef,
       uploaderFiles,
       showLoading,

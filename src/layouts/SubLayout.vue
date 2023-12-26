@@ -73,6 +73,9 @@ export default defineComponent({
     backPressed() {
       this.$router.push({ path: "/" });
     },
+    toUser() {
+      this.$router.push("/login");
+    },
   },
 });
 </script>

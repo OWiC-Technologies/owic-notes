@@ -89,12 +89,22 @@ export default {
     const limitWidthOrHeightToFiftyPixels = ({ width, height }) =>
       width < 100 || height < 100;
 
+    const getClientX = (e) => {
+      return e.clientX || e.changedTouches[0].clientX;
+    };
+
+    const getClientY = (e) => {
+      return e.clientY || e.changedTouches[0].clientY;
+    };
+
     const startHorizontalResize = (e) => {
       isHorizontalResizeActive.value = true;
-      lastCursorX.value = e.clientX;
+      lastCursorX.value = getClientX(e);
 
       document.addEventListener("mousemove", onHorizontalMouseMove);
       document.addEventListener("mouseup", stopHorizontalResize);
+      document.addEventListener("touchmove", onHorizontalMouseMove);
+      document.addEventListener("touchup", stopHorizontalResize);
     };
 
     const stopHorizontalResize = () => {
@@ -103,6 +113,8 @@ export default {
 
       document.removeEventListener("mousemove", onHorizontalMouseMove);
       document.removeEventListener("mouseup", stopHorizontalResize);
+      document.removeEventListener("touchmove", onHorizontalMouseMove);
+      document.removeEventListener("touchup", stopHorizontalResize);
     };
 
     const onHorizontalResize = (directionOfMouseMove, diff) => {
@@ -142,8 +154,8 @@ export default {
     const onHorizontalMouseMove = (e) => {
       if (!isHorizontalResizeActive.value) return;
 
-      const diff = lastCursorX.value - e.clientX;
-      lastCursorX.value = e.clientX;
+      const diff = lastCursorX.value - getClientX(e);
+      lastCursorX.value = getClientX(e);
 
       if (diff === 0) return;
 
@@ -156,10 +168,12 @@ export default {
 
     const startVerticalResize = (e) => {
       isVerticalResizeActive.value = true;
-      lastCursorY.value = e.clientY;
+      lastCursorY.value = getClientY(e);
 
       document.addEventListener("mousemove", onVerticalMouseMove);
       document.addEventListener("mouseup", stopVerticalResize);
+      document.addEventListener("touchmove", onVerticalMouseMove);
+      document.addEventListener("touchup", stopVerticalResize);
     };
 
     const stopVerticalResize = () => {
@@ -168,13 +182,15 @@ export default {
 
       document.removeEventListener("mousemove", onVerticalMouseMove);
       document.removeEventListener("mouseup", stopVerticalResize);
+      document.removeEventListener("touchmove", onVerticalMouseMove);
+      document.removeEventListener("touchup", stopVerticalResize);
     };
 
     const onVerticalMouseMove = (e) => {
       if (!isVerticalResizeActive.value) return;
 
-      const diff = lastCursorY.value - e.clientY;
-      lastCursorY.value = e.clientY;
+      const diff = lastCursorY.value - getClientY(e);
+      lastCursorY.value = getClientY(e);
 
       if (diff === 0) return;
 
@@ -293,6 +309,8 @@ export default {
           title="Resize"
           @mousedown="startHorizontalResize"
           @mouseup="stopHorizontalResize"
+          @touchstart="startHorizontalResize"
+          @touchend="stopHorizontalResize"
         />
 
         <div
@@ -301,6 +319,8 @@ export default {
           title="Resize"
           @mousedown="startVerticalResize"
           @mouseup="stopVerticalResize"
+          @touchstart="startVerticalResize"
+          @touchend="stopVerticalResize"
         />
       </div>
 
@@ -360,27 +380,34 @@ export default {
   .vertical-resize-handle {
     position: absolute;
     z-index: 50;
-    opacity: 0.5;
+    opacity: 0;
+    background-color: white;
+    border-color: $primary;
+    border-width: 0.25em;
+    border-radius: 0.4em;
+    border-style: solid;
 
     &:hover {
-      background-color: #ffffff88;
+      opacity: 0.8;
     }
   }
 
   .horizontal-resize-handle {
-    height: 100%;
-    width: 1em;
-    top: 0;
+    height: 20%;
+    width: 0.8em;
+    top: 40%;
     right: 0;
     cursor: col-resize;
+    margin: 0.3em;
   }
 
   .vertical-resize-handle {
-    width: 100%;
-    height: 1em;
+    width: 20%;
+    height: 0.8em;
     bottom: 0;
-    left: 0;
+    left: 40%;
     cursor: row-resize;
+    margin: 0.3em;
   }
 }
 

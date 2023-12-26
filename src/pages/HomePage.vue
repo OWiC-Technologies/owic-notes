@@ -4,6 +4,7 @@
   <q-page class="full-width column q-px-lg q-pt-md">
     <div class="full-width column self-center" style="max-width: 60em">
       <q-fab
+        v-if="!isDragging"
         vertical-actions
         color="primary"
         icon="mdi-plus"
@@ -11,11 +12,37 @@
         direction="up"
         class="fixed-bottom-right"
         @click="createNewNote"
-      >
-      </q-fab>
+      />
+      <div v-else>
+        <draggable
+          class="fixed-bottom-right"
+          style="height: 5rem; width: 5rem; z-index: 991"
+          v-model="deleteElements"
+          group="notes"
+          item-key="id"
+          @change="updateColumns"
+          @start="startDrag"
+          @end="endDrag"
+        >
+          <template #item="{ element }">
+            <div style="display: none">{{ element.content }}</div>
+          </template>
+        </draggable>
+        <q-fab
+          vertical-actions
+          color="negative"
+          icon="mdi-delete"
+          direction="up"
+          class="fixed-bottom-right"
+          @dragover.prevent
+          @drop="deleteNote"
+        />
+      </div>
 
       <div
-        v-show="columnElements[0].length === 0"
+        v-show="
+          columnElements[0].length === 0 && columnElements[1].length === 0
+        "
         class="full-width column items-center q-pa-lg"
         style="height: 80vh"
       >
@@ -40,19 +67,34 @@
         </div>
       </div>
 
-      <div class="full-width row" v-if="columnElements[0].length !== 0">
+      <div
+        class="full-width row"
+        style="height: 80vh"
+        v-if="columnElements[0].length !== 0 || columnElements[1].length !== 0"
+      >
         <div
           class="full-width col"
           v-for="(column, index) in columnElements"
           v-bind:key="index"
         >
-          <div
-            class="item-container q-pa-sm"
-            v-for="(item, index) in column"
-            v-bind:key="index"
+          <draggable
+            style="height: 100%"
+            v-model="columnElements[index]"
+            group="notes"
+            item-key="id"
+            @change="updateColumns"
+            @start="startDrag"
+            @end="endDrag"
           >
-            <NotePreview :content="item.content" @click="clickNote(item.id)" />
-          </div>
+            <template #item="{ element }">
+              <div class="item-container q-pa-xs">
+                <NotePreview
+                  :content="element.content"
+                  @click="clickNote(element.id)"
+                />
+              </div>
+            </template>
+          </draggable>
         </div>
       </div>
     </div>
@@ -63,14 +105,16 @@
 import { ref, defineComponent, onMounted } from "vue";
 import { useQuasar } from "quasar";
 import { OWiCConnect } from "owic-app-service";
-import NotePreview from "src/components/NotePreview.vue";
 import { useRouter } from "vue-router";
 import { v4 as uuidv4 } from "uuid";
+import draggable from "vuedraggable";
+import NotePreview from "src/components/NotePreview.vue";
 
 export default defineComponent({
   name: "HomePage",
   components: {
     NotePreview,
+    draggable,
   },
   setup(props) {
     const $q = useQuasar();
@@ -78,18 +122,49 @@ export default defineComponent({
     const router = useRouter();
     // UI Properties
     const uploaderRef = ref();
-    const selectMode = ref(false);
-    const selectedList = ref([]);
+    const isDragging = ref(false);
     const columnElements = ref([[], []]);
+    const deleteElements = ref([]);
     // File Variables
     const notesList = ref([]);
 
-    function updateColumns() {
+    function setColumns() {
       const columnImages = [[], []];
       notesList.value.forEach((note, index) => {
-        columnImages[index % 2].push(note);
+        if (note.pos) {
+          columnImages[note.pos[0]].push(note);
+        } else {
+          columnImages[index % 2].push(note);
+        }
       });
       columnElements.value = columnImages;
+    }
+
+    function updateColumns(e) {
+      for (let i = 0; i < columnElements.value.length; i++) {
+        for (let j = 0; j < columnElements.value[i].length; j++) {
+          columnElements.value[i][j].pos = [i, j];
+        }
+      }
+
+      notesList.value = [];
+      let i,
+        l = Math.min(
+          columnElements.value[0].length,
+          columnElements.value[1].length
+        );
+
+      for (i = 0; i < l; i++) {
+        notesList.value.push(
+          columnElements.value[0][i],
+          columnElements.value[1][i]
+        );
+      }
+      notesList.value.push(
+        ...columnElements.value[0].slice(l),
+        ...columnElements.value[1].slice(l)
+      );
+      OWiCConnect.setData("notes", notesList.value);
     }
 
     const clickNote = (id) => {
@@ -116,7 +191,7 @@ export default defineComponent({
               content: [
                 {
                   type: "text",
-                  text: "New note!",
+                  text: "",
                 },
               ],
             },
@@ -137,16 +212,21 @@ export default defineComponent({
       }
     };
 
-    const toggleSelectMode = () => {
-      selectMode.value = !selectMode.value;
-      selectedList.value = [];
+    const startDrag = (e) => {
+      isDragging.value = true;
+      console.log(e);
+    };
+
+    const endDrag = (e) => {
+      isDragging.value = false;
+      console.log(e);
     };
 
     onMounted(async () => {
       const response = await OWiCConnect.getData("notes");
       if (Symbol.iterator in Object(response)) {
         notesList.value.push(...response);
-        updateColumns();
+        setColumns();
       }
 
       const checkLoggedIn = await OWiCConnect.getUser();
@@ -156,13 +236,15 @@ export default defineComponent({
     });
 
     return {
-      selectMode,
-      selectedList,
+      isDragging,
       uploaderRef,
       columnElements,
+      deleteElements,
       clickNote,
       createNewNote,
-      toggleSelectMode,
+      startDrag,
+      endDrag,
+      updateColumns,
     };
   },
 });

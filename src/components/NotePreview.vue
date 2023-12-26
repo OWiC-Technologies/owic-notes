@@ -6,11 +6,12 @@
 
 <style lang="scss">
 .preview-card {
-  border-radius: 4px;
+  border-radius: 0.8rem;
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
   overflow: visible;
   background-color: white;
   min-height: 10em;
+  padding-bottom: 1em;
 }
 
 .preview .tiptap {
@@ -18,6 +19,7 @@
   width: 100%;
   max-height: 30vh;
   overflow: hidden;
+  pointer-events: none;
 }
 </style>
 

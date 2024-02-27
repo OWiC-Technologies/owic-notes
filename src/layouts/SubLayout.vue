@@ -50,7 +50,10 @@ export default defineComponent({
   name: "SubLayout",
   setup() {
     const safeArea = computed(() => {
-      return OWiCConnect.getPlatform() == OWICPlatform.APP;
+      return (
+        OWiCConnect.getPlatform() == OWICPlatform.APP &&
+        OWiCConnect.getVersion() === "1.0.0"
+      );
     });
     const photoUrl = ref("");
 

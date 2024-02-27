@@ -1,6 +1,6 @@
 {
   "name": "owic-notes",
-  "version": "0.0.2",
+  "version": "0.1.2",
   "description": "A simple notes experience powered by OWiC Technologies",
   "productName": "Notes by OWiC",
   "author": "Kevin Sun <kevin@owictech.com>",
@@ -54,7 +54,7 @@
     "@tiptap/extension-underline": "^2.1.13",
     "@tiptap/pm": "^2.1.13",
     "@tiptap/vue-3": "^2.1.13",
-    "owic-app-service": "^1.0.0",
+    "owic-app-service": "^1.2.26",
     "quasar": "^2.12.7",
     "uuid": "^9.0.1",
     "vue": "^3.0.0",

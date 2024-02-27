@@ -68,12 +68,12 @@ module.exports = configure(function (/* ctx */) {
       // polyfillModulePreload: true,
       // distDir
 
-      extendViteConf(viteConf) {
-        viteConf.optimizeDeps = {
-          include: ["owic-app-service"],
-        };
-        return viteConf;
-      },
+      // extendViteConf(viteConf) {
+      //   viteConf.optimizeDeps = {
+      //     include: ["owic-app-service"],
+      //   };
+      //   return viteConf;
+      // },
       // viteVuePluginOptions: {},
 
       // vitePlugins: [

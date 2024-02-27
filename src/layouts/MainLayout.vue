@@ -87,7 +87,10 @@ export default defineComponent({
 
   setup() {
     const safeArea = computed(() => {
-      return OWiCConnect.getPlatform() == OWICPlatform.APP;
+      return (
+        OWiCConnect.getPlatform() == OWICPlatform.APP &&
+        OWiCConnect.getVersion() === "1.0.0"
+      );
     });
     const leftDrawerOpen = ref(false);
     const photoUrl = ref("");

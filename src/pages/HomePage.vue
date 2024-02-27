@@ -102,7 +102,7 @@
 </template>
 
 <script>
-import { ref, defineComponent, onMounted } from "vue";
+import { ref, defineComponent, onMounted, getCurrentInstance } from "vue";
 import { useQuasar } from "quasar";
 import { OWiCConnect } from "owic-app-service";
 import { useRouter } from "vue-router";
@@ -223,11 +223,17 @@ export default defineComponent({
     };
 
     onMounted(async () => {
-      const response = await OWiCConnect.getData("notes");
-      if (Symbol.iterator in Object(response)) {
-        notesList.value.push(...response);
-        setColumns();
+      async function reloadPage() {
+        const response = await OWiCConnect.getData("notes");
+        if (Symbol.iterator in Object(response)) {
+          notesList.value = [];
+          setColumns();
+          notesList.value.push(...response);
+          setTimeout(() => setColumns(), 1);
+        }
       }
+      OWiCConnect.onDataChanged = reloadPage;
+      reloadPage();
 
       const checkLoggedIn = await OWiCConnect.getUser();
       if (checkLoggedIn.errors.length == 0) {

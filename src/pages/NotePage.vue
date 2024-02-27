@@ -189,15 +189,20 @@ export default {
     });
 
     onMounted(async () => {
-      const response = await OWiCConnect.getData("notes");
-      notesList.value.push(...response);
+      async function loadPage() {
+        const response = await OWiCConnect.getData("notes");
+        notesList.value = [];
+        notesList.value.push(...response);
 
-      let saveIndex = notesList.value.findIndex((note) => note.id == noteId);
-      if (saveIndex !== -1) {
-        let noteId = notesList.value[saveIndex].id;
-        let noteContent = notesList.value[saveIndex].content;
-        editor.value.commands.setContent(noteContent);
+        let saveIndex = notesList.value.findIndex((note) => note.id == noteId);
+        if (saveIndex !== -1) {
+          let noteId = notesList.value[saveIndex].id;
+          let noteContent = notesList.value[saveIndex].content;
+          editor.value.commands.setContent(noteContent);
+        }
       }
+      OWiCConnect.onDataChanged = loadPage;
+      loadPage();
     });
 
     const checkFile = (files) => {
